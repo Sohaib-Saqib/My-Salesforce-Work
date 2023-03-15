@@ -1,0 +1,41 @@
+@IsTest
+private class ControllerRelatedlistsTest {
+    
+    @IsTest
+    public static void Testing(){
+        Account acc2 = new Account(Name = 'Test2');
+        Account acc = new Account(Name = 'Test',ParentId = acc2.Id );
+        Account acc1 = new Account(Name = 'Test1' , ParentId = acc.Id);
+        
+        
+        Date myDate = Date.newInstance(2022, 03, 01);
+
+        
+        Contact con = new Contact(LastName = 'Test Con', AccountId = acc.Id);
+        Opportunity opp = new Opportunity(Name = 'Test Opp', AccountId = acc.Id , CloseDate = myDate , StageName = 'Prospecting');
+        Implementation__c Imp = new Implementation__c(   Account__c = acc.id, Opportunity__c = opp.id);
+        
+        insert con;
+        insert opp;
+        insert Imp;
+        
+        ControllerForParentAccountRelatedlists.getContacts(acc1.Id);
+        ControllerForParentAccountRelatedlists.getImplementations(acc1.Id);
+        ControllerForParentAccountRelatedlists.getOpportunities(acc1.Id);
+        ControllerForParentAccountRelatedlists.getAccounts(acc1.Id);
+        ControllerForParentAccountRelatedlists.isParentAccount(acc1.Id);
+        
+        ControllerForParentAccountRelatedlists.getContacts(acc2.Id);
+        ControllerForParentAccountRelatedlists.getImplementations(acc2.Id);
+        ControllerForParentAccountRelatedlists.getOpportunities(acc2.Id);
+        ControllerForParentAccountRelatedlists.getAccounts(acc2.Id);
+        ControllerForParentAccountRelatedlists.isParentAccount(acc2.Id);
+        
+      
+      }
+    
+    
+    
+    
+    
+}
