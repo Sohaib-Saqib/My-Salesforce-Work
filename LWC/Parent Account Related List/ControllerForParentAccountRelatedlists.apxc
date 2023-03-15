@@ -1,0 +1,79 @@
+public with sharing class ControllerForParentAccountRelatedlists {
+    
+    @AuraEnabled
+    public static List<Contact> getContacts(string accountId) {
+        List<Account> AccList = new List<Account>();
+        AccList = getAccounts(accountId);
+        List<String> accIds = new List<String>();
+        for (Account a : AccList) {
+            accIds.add(a.Id);
+        }
+        accIds.add(accountId);
+        
+        List<Contact> con = [SELECT Id, Name,MobilePhone,Phone,Email, Account.Name,Secondary_Email__c, AccountId FROM Contact where accountid in: accIds];
+        if(con.isEmpty()) return NULL;
+        return con;
+    } 
+    
+    @AuraEnabled
+    public static List<Implementation__c> getImplementations(Id accountId) {
+        
+        List<Account> AccList = new List<Account>();
+        AccList = getAccounts(accountId);
+        List<String> accIds = new List<String>();
+        for (Account a : AccList) {
+            accIds.add(a.Id);
+        }
+        accIds.add(accountId);
+        
+        List<Implementation__c> Imp = new List<Implementation__c>();
+        Imp = [SELECT Id, Name, Health__c , Implementation_status_2__c , Office_Go_Live_Date__c , Live_Age__c , Graduation_Date__c FROM Implementation__c WHERE Account__c IN :accIds];
+        if(Imp.isEmpty()) return NULL;
+        return Imp;
+    }
+    
+    @AuraEnabled
+    public static List<Opportunity> getOpportunities(Id accountId) {
+        List<Account> AccList = new List<Account>();
+        AccList = getAccounts(accountId);
+        List<String> accIds = new List<String>();
+        for (Account a : AccList) {
+            accIds.add(a.Id);
+        }
+        accIds.add(accountId);
+        
+        List<Opportunity> Opp = new List<Opportunity>();
+        Opp = [SELECT Id, Name, Amount, StageName, Account.Name,CloseDate, AccountId FROM Opportunity WHERE AccountId IN :accIds];
+        if(Opp.isEmpty()) return NULL;
+        return Opp;
+        
+        
+    }
+    private static void findChilds(Set<Id> ChildIds, Id accountId) {
+        List<Account> childAccounts = [SELECT Id FROM Account WHERE ParentId = :accountId];
+        for (Account a : childAccounts) {
+            ChildIds.add(a.Id);
+            findChilds(ChildIds, a.Id);
+        }
+    }
+    @AuraEnabled
+    public static List<Account> getAccounts(Id accountId) {
+        Set<Id> ChildIds = new Set<Id>();
+        findChilds(ChildIds, accountId);
+        List<Account> accounts = [SELECT Id, Name, BillingCity, Phone FROM Account WHERE Id IN :ChildIds AND Id != :accountId order by Name asc];
+        system.debug('Account Size : '+ accounts.size());
+        return accounts;
+    }
+    
+    @AuraEnabled
+    public static Boolean isParentAccount(Id accountId) {
+        List<Account> childAccounts = [SELECT Id, Name FROM Account WHERE ParentId = :accountId];
+        if (childAccounts.isEmpty()) {
+            return false;
+        } else {
+            return true;
+        }
+        
+    }
+    
+}
