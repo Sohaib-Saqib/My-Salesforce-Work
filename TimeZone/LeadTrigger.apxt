@@ -1,0 +1,48 @@
+trigger LeadTrigger on Lead (after insert, after update, after delete, before insert, before update, before delete) {
+
+    LeadTriggerHandler handler = new LeadTriggerHandler(Trigger.isExecuting, Trigger.size);
+    
+    if( Trigger.isInsert )
+    {
+        
+            
+        if(Trigger.isBefore)
+        {
+            UpdateStateHandler.updateCountry(trigger.New, trigger.oldMap);   // Added on 9th Feb
+            UpdateStateHandler.updateState(trigger.New, trigger.oldMap);     // Added on 9th Feb
+            handler.OnBeforeInsert(trigger.New);
+        }
+        else
+        {
+            handler.OnAfterInsert(trigger.New, trigger.NewMap);
+            UpdateStateHandler.checkValidation(trigger.new);    // Added on 14th Feb
+        }
+    }
+    else if ( Trigger.isUpdate )
+    {
+                
+        if(Trigger.isBefore)
+        {
+            UpdateStateHandler.updateCountry(trigger.New, trigger.oldMap);   // Added on 9th Feb
+            UpdateStateHandler.updateState(trigger.New, trigger.oldMap);     // Added on 9th Feb
+
+            handler.OnBeforeUpdate(trigger.New ,trigger.Old,Trigger.NewMap,Trigger.OldMap);
+        }
+        else
+        {
+            handler.OnAfterUpdate(trigger.New ,trigger.Old,Trigger.NewMap,Trigger.OldMap);
+            UpdateStateHandler.checkValidation(trigger.new);    // Added on 14th Feb
+        }
+    }
+    else if ( Trigger.isDelete )
+    {
+        if(Trigger.isBefore)
+        {
+            handler.OnBeforeDelete(trigger.New);
+        }
+        else
+        {
+            handler.OnAfterDelete(trigger.Old);
+        }
+    }
+}
