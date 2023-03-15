@@ -1,0 +1,321 @@
+public with sharing class UpdateStateHandler {
+    
+    
+    public static void checkValidation (List<Lead> NewRecords){
+        
+        string State, cou;
+        for(Lead l: NewRecords) {
+            
+            
+            if(l.state != NULL){
+                State = l.state.toLowerCase();
+            }
+            
+            if(l.country != NULL){
+                cou = l.country.toLowerCase();
+            }
+            
+            if(l.status == 'Demo Scheduled'){
+                if(l.Country__c == 'USA' || cou == 'usa' ||cou == 'united states' || cou == 'united state' || cou == 'us' || cou == 'u.s.a' || cou == 'u.s' || cou == 'united states of america')
+                    if ( State == '' || State == NULL) {
+                        LeadException.ThrowExceptionStateValidation(l, 'Please Enter a State.');
+                    }else if ((State.contains('alaska') || State == 'ak') && (l.state__c != 'Alaska' && l.state__c != 'Alaska (Aleutian Islands)')) {
+                        LeadException.ThrowExceptionStateValidation(l, 'Please Select Alaska or Alaska (Aleutian Islands) and Country Manually.');
+                    } else if ((State.contains('arizona') || State == 'az') && (l.state__c != 'Arizona' && l.state__c != 'Arizona  (Navajo)')) {
+                        LeadException.ThrowExceptionStateValidation(l, 'Please Select Arizona or Arizona  (Navajo) and Country Manually.');
+                    } else if ((State.contains('florida') || State == 'fl') && (l.state__c != 'Florida' && l.state__c != 'Florida  (W)')) {
+                        LeadException.ThrowExceptionStateValidation(l, 'Please Select Florida or Florida  (W) and Country Manually.');
+                    } else if ((State.contains('idaho') || State == 'id') && (l.state__c != 'Idaho   (S)' && l.state__c != 'Idaho  (N)')) {
+                        LeadException.ThrowExceptionStateValidation(l, 'Please Select Idaho   (S) or Idaho  (N) and Country Manually.');
+                    } else if ((State.contains('indiana') || State == 'in') && (l.state__c != 'Indiana' && l.state__c != 'Indiana   (NW)')) {
+                        LeadException.ThrowExceptionStateValidation(l, 'Please Select Indiana or Indiana   (NW) and Country Manually.');
+                    } else if ((State.contains('kansas') || State == 'ks') && (l.state__c != 'Kansas' && l.state__c != 'Kansas   (W)')) {
+                        LeadException.ThrowExceptionStateValidation(l, 'Please Select Kansas or Kansas   (W) and Country Manually.');
+                    } else if ((State.contains('kentucky') || State == 'ky') && (l.state__c != 'Kentucky   (E)' && l.state__c != 'Kentucky   (W)')) {
+                        LeadException.ThrowExceptionStateValidation(l, 'Please Select Kentucky   (E) or Kentucky   (W) and Country Manually.');
+                    } else if ((State.contains('michigan') || State == 'mi') && (l.state__c != 'Michigan   (W)' && l.state__c != 'Michigan')) {
+                        LeadException.ThrowExceptionStateValidation(l, 'Please Select Michigan   (W) or Michigan and Country Manually.');
+                    } else if ((State.contains('n.dakota') || State == 'nd') && (l.state__c != 'N.Dakota' && l.state__c != 'N.Dakota   (W)')) {
+                        LeadException.ThrowExceptionStateValidation(l, 'Please Select N.Dakota or N.Dakota   (W) and Country Manually.');
+                    } else if ((State.contains('nebraska') || State == 'ne') && (l.state__c != 'Nebraska' && l.state__c != 'Nebraska   (W)')) {
+                        LeadException.ThrowExceptionStateValidation(l, 'Please Select Nebraska or Nebraska   (W) and Country Manually.');
+                    } else if ((State.contains('oregon') || State == 'or') && (l.state__c != 'Oregon' && l.state__c != 'Oregon  (E)')) {
+                        LeadException.ThrowExceptionStateValidation(l, 'Please Select Oregon or Oregon  (E) and Country Manually.');
+                    }else if((State.contains('s.dakota') || State == 'sd') && (l.state__c != 'S.Dakota   (W)' && l.state__c != 'S.Dakota   (E)')) {
+                        LeadException.ThrowExceptionStateValidation(l,'Please Select S.Dakota (W) or S.Dakota (E) and Country Manually.');
+                    } else if((State.contains('texas') || State == 'tx') && (l.state__c != 'Texas' && l.state__c != 'Texas   (W)')) {
+                        LeadException.ThrowExceptionStateValidation(l,'Please Select Texas or Texas (W) and Country Manually.');
+                    } else if((State.contains('tennessee') || State == 'tn') && (l.state__c != 'Tennessee   (E)' && l.state__c != 'Tennessee   (W)')) {
+                        LeadException.ThrowExceptionStateValidation(l,'Please Select Tennessee (E) or Tennessee (W) and Country Manually.');
+                    }
+                else if (
+                    state != 'ak' && state != 'alaska' &&
+                    state != 'al' && state != 'alabama' &&
+                    state != 'az' && state != 'arizona' &&
+                    state != 'ar' && state != 'arkansas' &&
+                    state != 'ca' && state != 'california' &&
+                    state != 'co' && state != 'colorado' &&
+                    state != 'ct' && state != 'connecticut' &&
+                    state != 'de' && state != 'delaware' &&
+                    state != 'dc' && state != 'district of columbia' &&
+                    state != 'fl' && state != 'florida' &&
+                    state != 'ga' && state != 'georgia' &&
+                    state != 'hi' && state != 'hawaii' &&
+                    state != 'id' && state != 'idaho' &&
+                    state != 'il' && state != 'illinois' &&
+                    state != 'in' && state != 'indiana' &&
+                    state != 'ia' && state != 'iowa' &&
+                    state != 'ks' && state != 'kansas' &&
+                    state != 'ky' && state != 'kentucky' &&
+                    state != 'la' && state != 'louisiana' &&
+                    state != 'me' && state != 'maine' &&
+                    state != 'md' && state != 'maryland' &&
+                    state != 'ma' && state != 'massachusetts' &&
+                    state != 'mi' && state != 'michigan' &&
+                    state != 'mn' && state != 'minnesota' &&
+                    state != 'ms' && state != 'mississippi' &&
+                    state != 'mo' && state != 'missouri' &&
+                    state != 'mt' && state != 'montana' &&
+                    state != 'ne' && state != 'nebraska' &&
+                    state != 'nv' && state != 'nevada' &&
+                    state != 'nh' && state != 'new hampshire' &&
+                    state != 'nj' && state != 'new jersey' &&
+                    state != 'nm' && state != 'new mexico' &&
+                    state != 'ny' && state != 'new york' &&
+                    state != 'nc' && state != 'north carolina' &&
+                    state != 'nd' && state != 'north dakota' &&
+                    state != 'oh' && state != 'ohio' &&
+                    state != 'ok' && state != 'oklahoma' &&
+                    state != 'or' && state != 'oregon' &&
+                    state != 'pa' && state != 'pennsylvania' &&
+                    state != 'ri' && state != 'rhode island' &&
+                    state != 'sc' && state != 'south carolina' &&
+                    state != 'sd' && state != 'south dakota' &&
+                    state != 'tn' && state != 'tennessee' &&
+                    state != 'tx' && state != 'texas' &&
+                    state != 'ut' && state != 'utah' &&
+                    state != 'vt' && state != 'vermont' &&
+                    state != 'va' && state != 'virginia' &&
+                    state != 'wa' && state != 'washington' &&
+                    state != 'wv' && state != 'west virginia' &&
+                    state != 'wi' && state != 'wisconsin' &&
+                    state != 'wy' && state != 'wyoming'
+                ){
+                    LeadException.ThrowExceptionStateValidation(l,'Please Enter a correct US State');
+                }
+            }
+            
+            
+            if(l.status == 'Demo Scheduled')
+                if(l.Country__c == 'Canada' || cou == 'CA' || cou == 'canada' )
+                if ( State == '' || State == NULL) {
+                    LeadException.ThrowExceptionStateValidation(l, 'Please Enter a State.');
+                }else if(
+                    State != 'ab' && State != 'alberta' &&
+                    State != 'bc' && State != 'british columbia' &&
+                    State != 'mb' && State != 'manitoba' &&
+                    State != 'nb' && State != 'new brunswick' &&
+                    State != 'nl' && State != 'newfoundland and labrador' &&
+                    State != 'nt' && State != 'northwest territories' &&
+                    State != 'ns' && State != 'nova scotia' &&
+                    State != 'nu' && State != 'nunavut' &&
+                    State != 'on' && State != 'ontario' &&
+                    State != 'pe' && State != 'prince edward island' &&
+                    State != 'qc' && State != 'quebec' &&
+                    State != 'sk' && State != 'saskatchewan' &&
+                    State != 'yt' && State != 'yukon' ){
+                        LeadException.ThrowExceptionStateValidation(l,'Please Enter a correct State Name/Abbreviation.');
+                    }
+        }
+    }    
+    public static void updateCountry(List<Lead> leads,  Map<Id, Lead> oldLeads) {
+        
+        String CountryInSmallLetters;
+        for(Lead l1 : leads){
+                        /*       Lead oldLead;
+            boolean checkOldCountry;
+            if(oldLeads.get(l1.Id) != NULL){
+            oldLead = oldLeads.get(l1.Id);
+            checkOldCountry = oldLead.Country != l1.Country;
+            }else{
+            checkOldCountry = False;
+            }*/
+            
+            
+            //    if(checkOldCountry){
+            if(l1.country != NULL){
+                CountryInSmallLetters = l1.country.toLowerCase();
+                if(CountryInSmallLetters == 'usa' || CountryInSmallLetters == 'united states' || CountryInSmallLetters == 'united state' || CountryInSmallLetters == 'us' || CountryInSmallLetters == 'u.s.a' || CountryInSmallLetters == 'u.s' || CountryInSmallLetters == 'united states of america'){
+                    l1.Country__c = 'USA';
+                    if(l1.State == '' || l1.State == NULL){
+                        LeadException.ThrowExceptionStateValidation(l1,'Please Enter a State.');
+                    }
+                    // l1.State__c = NULL;
+                }else if(CountryInSmallLetters == 'canada'  || CountryInSmallLetters == 'ca'){
+                    l1.Country__c = 'Canada';
+                    if(l1.State == '' || l1.State == NULL){
+                        LeadException.ThrowExceptionStateValidation(l1,'Please Enter a State.');
+                    }
+                    l1.State__c = NULL;
+                }else{
+                    LeadException.ThrowExceptionStateValidation(l1,'Please Enter correct Country i.e USA or Canada.');
+                    //     l1.Country__c = 'Other';
+                    //     l1.State__c = NULL;
+                }
+            }else if(l1.Status == 'Demo Scheduled'){
+                LeadException.ThrowExceptionStateValidation(l1,'Please Enter a Country Name i.e USA or Canada.');
+                //      l1.Country__c = 'Other';
+                //      l1.State__c = NULL;
+                //     l1.Timezone_Flow__c =  NULL;
+            }
+            
+            
+            
+        }
+    }
+    
+    public static void updateState(List<Lead> leads, Map<Id, Lead> oldLeads) {
+        
+        String StateInSmallLetters;
+        for(Lead l1 : leads){
+            
+            //      Lead oldLead = oldLeads.get(l1.Id);
+            
+            
+            if (/* ( l1.State != oldLead.State || l1.State__c == NULL ) && */l1.state != NULL ){
+                StateInSmallLetters = l1.state.toLowerCase();
+                if(l1.Country__c == 'USA'){
+                    if(StateInSmallLetters == 'al' || StateInSmallLetters == 'alabama'){
+                        l1.State__c = 'Alabama';
+                    }else if(StateInSmallLetters == 'ar' || StateInSmallLetters == 'arkansas'){
+                        l1.State__c = 'Arkansas';
+                    }else if(StateInSmallLetters == 'ca' || StateInSmallLetters == 'california'){
+                        l1.State__c = 'California';
+                    }else if(StateInSmallLetters == 'co' || StateInSmallLetters == 'colorado'){
+                        l1.State__c = 'Colorado';
+                    }else if(StateInSmallLetters == 'dc' || StateInSmallLetters == 'columbia'){
+                        l1.State__c = 'Columbia';
+                    }else if(StateInSmallLetters == 'ct' || StateInSmallLetters == 'connecticut'){
+                        l1.State__c = 'Connecticut';
+                    }else if(StateInSmallLetters == 'de' || StateInSmallLetters == 'delaware'){
+                        l1.State__c = 'Delaware';
+                    }else if(StateInSmallLetters == 'ga' || StateInSmallLetters == 'georgia'){
+                        l1.State__c = 'Georgia';
+                    }else if(StateInSmallLetters == 'hi' || StateInSmallLetters == 'hawaii'){
+                        l1.State__c = 'Hawaii';
+                    }else if(StateInSmallLetters == 'il' || StateInSmallLetters == 'illinois'){
+                        l1.State__c = 'Illinois';
+                    }else if(StateInSmallLetters == 'ia' || StateInSmallLetters == 'iowa'){
+                        l1.State__c = 'Iowa';
+                    }else if(StateInSmallLetters == 'la' || StateInSmallLetters == 'louisiana'){
+                        l1.State__c = 'Louisiana';
+                    }else if(StateInSmallLetters == 'me' || StateInSmallLetters == 'maine'){
+                        l1.State__c = 'Maine';
+                    }else if(StateInSmallLetters == 'md' || StateInSmallLetters == 'maryland'){
+                        l1.State__c = 'Maryland';
+                    }else if(StateInSmallLetters == 'ma' || StateInSmallLetters == 'massachusetts'){
+                        l1.State__c = 'Massachusetts';
+                    }else if(StateInSmallLetters == 'mn' || StateInSmallLetters == 'minnesota'){
+                        l1.State__c = 'Minnesota';
+                    }else if(StateInSmallLetters == 'ms' || StateInSmallLetters == 'mississippi'){
+                        l1.State__c = 'Mississippi';
+                    }else if(StateInSmallLetters == 'mo' || StateInSmallLetters == 'missouri'){
+                        l1.State__c = 'Missouri';
+                    }else if(StateInSmallLetters == 'mt' || StateInSmallLetters == 'montana'){
+                        l1.State__c = 'Montana';
+                    }else if(StateInSmallLetters == 'nc' || StateInSmallLetters == 'n.carolina'){
+                        l1.State__c = 'N.Carolina';
+                    }else if(StateInSmallLetters == 'nv' || StateInSmallLetters == 'nevada'){
+                        l1.State__c = 'Nevada';
+                    }else if(StateInSmallLetters == 'nh' || StateInSmallLetters == 'new hampshire'){
+                        l1.State__c = 'New Hampshire';
+                    }else if(StateInSmallLetters == 'nj' || StateInSmallLetters == 'new jersey'){
+                        l1.State__c = 'New Jersey';
+                    }else if(StateInSmallLetters == 'nm' || StateInSmallLetters == 'new mexico'){
+                        l1.State__c = 'New Mexico';
+                    }else if(StateInSmallLetters == 'ny' || StateInSmallLetters == 'new york'){
+                        l1.State__c = 'New York';
+                    }else if(StateInSmallLetters == 'oh' || StateInSmallLetters == 'ohio'){
+                        l1.State__c = 'Ohio';
+                    }else if(StateInSmallLetters == 'ok' || StateInSmallLetters == 'oklahoma'){
+                        l1.State__c = 'Oklahoma';
+                    }else if(StateInSmallLetters == 'pa' || StateInSmallLetters == 'pennsylvania'){
+                        l1.State__c = 'Pennsylvania';
+                    }else if(StateInSmallLetters == 'ri' || StateInSmallLetters == 'rhode island'){
+                        l1.State__c = 'Rhode Island';
+                    }else if(StateInSmallLetters == 'sc' || StateInSmallLetters == 'south carolina'){
+                        l1.State__c = 'South Carolina';
+                    }else if(StateInSmallLetters == 'ut' || StateInSmallLetters == 'utah'){
+                        l1.State__c = 'Utah';
+                    }else if(StateInSmallLetters == 'vt' || StateInSmallLetters == 'vermont'){
+                        l1.State__c = 'Vermont';
+                    }else if(StateInSmallLetters == 'va' || StateInSmallLetters == 'virginia'){
+                        l1.State__c = 'Virginia';
+                    }else if(StateInSmallLetters == 'wv' || StateInSmallLetters == 'west virginia'){
+                        l1.State__c = 'West Virginia';
+                    }else if(StateInSmallLetters == 'wa' || StateInSmallLetters == 'washington'){
+                        l1.State__c = 'Washington';
+                    }else if(StateInSmallLetters == 'wi' || StateInSmallLetters == 'wisconsin'){
+                        l1.State__c = 'Wisconsin';
+                    }else if(StateInSmallLetters == 'wy' || StateInSmallLetters == 'wyoming'){
+                        l1.State__c = 'Wyoming';
+                    }else if (StateInSmallLetters != 'ak' && StateInSmallLetters != 'alaska' && 
+                              StateInSmallLetters != 'az' && StateInSmallLetters != 'arizona' &&
+                              StateInSmallLetters != 'fl' && StateInSmallLetters != 'florida' &&
+                              StateInSmallLetters != 'id' && StateInSmallLetters != 'idaho' &&
+                              StateInSmallLetters != 'in' && StateInSmallLetters != 'indiana' &&
+                              StateInSmallLetters != 'ks' && StateInSmallLetters != 'kansas' &&
+                              StateInSmallLetters != 'ky' && StateInSmallLetters != 'kentucky' &&
+                              StateInSmallLetters != 'mi' && StateInSmallLetters != 'michigan' &&
+                              StateInSmallLetters != 'nd' && StateInSmallLetters != 'n.dakota' &&
+                              StateInSmallLetters != 'ne' && StateInSmallLetters != 'nebraska' &&
+                              StateInSmallLetters != 'or' && StateInSmallLetters != 'oregon' &&
+                              StateInSmallLetters != 'sd' && StateInSmallLetters != 's.dakota' &&
+                              StateInSmallLetters != 'tn' && StateInSmallLetters != 'tennessee' &&
+                              StateInSmallLetters != 'tx' && StateInSmallLetters != 'texas'){ 
+                                  //   if(!(oldLead.State__c == NULL && l1.State__c != NULL)){
+                                  l1.State__c = NULL;
+                                  //        system.debug('This is the culprit');
+                                  //   }
+                              }
+                }else if(l1.Country__c == 'Canada'){
+                    if(StateInSmallLetters == 'ab' || StateInSmallLetters == 'alberta' ){
+                        l1.State__c = 'Alberta';
+                    }else if(StateInSmallLetters == 'bc' || StateInSmallLetters == 'british columbia'){
+                        l1.State__c = 'British Columbia';
+                    }else if(StateInSmallLetters == 'mb' || StateInSmallLetters == 'manitoba'){
+                        l1.State__c = 'Manitoba';
+                    }else if(StateInSmallLetters == 'nb' || StateInSmallLetters == 'new brunswick'){
+                        l1.State__c = 'New Brunswick';
+                    }else if(StateInSmallLetters == 'nl' || StateInSmallLetters == 'newfoundland and labrador'){
+                        l1.State__c = 'Newfoundland and Labrador';
+                    }else if(StateInSmallLetters == 'nt' || StateInSmallLetters == 'northwest territories'){
+                        l1.State__c = 'Northwest Territories';
+                    }else if(StateInSmallLetters == 'ns' || StateInSmallLetters == 'nova scotia'){
+                        l1.State__c = 'Nova Scotia';
+                    }else if(StateInSmallLetters == 'nu' || StateInSmallLetters == 'nunavut'){
+                        l1.State__c = 'Nunavut';
+                    }else if(StateInSmallLetters == 'on' || StateInSmallLetters == 'ontario'){
+                        l1.State__c = 'Ontario';
+                    }else if(StateInSmallLetters == 'pe' || StateInSmallLetters == 'prince edward island'){
+                        l1.State__c = 'Prince Edward Island';
+                    }else if(StateInSmallLetters == 'qc' || StateInSmallLetters == 'quebec'){
+                        l1.State__c = 'Quebec';
+                    }else if(StateInSmallLetters == 'sk' || StateInSmallLetters == 'saskatchewan'){
+                        l1.State__c = 'Saskatchewan';
+                    }else if(StateInSmallLetters == 'yt' || StateInSmallLetters == 'yukon'){
+                        l1.State__c = 'Yukon';
+                    }else {
+                        l1.State__c = NULL;
+                    }
+                }else{
+                    l1.State__c = NULL;
+                }
+                
+            }
+            
+            
+        }
+        
+    }    
+}
