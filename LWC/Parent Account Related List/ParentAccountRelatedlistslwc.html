@@ -1,0 +1,83 @@
+<template>
+    <template if:true={isParent}>
+    
+        <lightning-card title=" Related Child Accounts">           
+                <template if:true={Account}>
+                    <div style="border: 1px solid lightgray">
+                    <lightning-datatable data={Account}
+                                        columns={myColumnsAccount}
+                                        key-field="Id"
+                                        hide-checkbox-column>
+                    </lightning-datatable>
+                    </div>
+                </template>
+                <template if:false={Account}>
+                    <div style="border: 2px solid lightgray">
+                        No Accounts to display.
+                    </div>
+                </template>        
+        </lightning-card>
+        
+        <div style="margin-bottom: 1rem;"></div>
+
+        <lightning-card title=" Related Child Contacts">         
+                <template if:true={Contact}>
+                    <div style="border: 1px solid lightgray">
+                    <lightning-datatable data={Contact}
+                                        columns={myColumnscontacts}
+                                        key-field="Id"
+                                        hide-checkbox-column>
+                    </lightning-datatable>
+                    </div>
+                </template>
+                <template if:false={Contact}>
+                    <div style="border: 2px solid lightgray">
+                        No Contacts to display.
+                    </div>
+                </template>    
+        </lightning-card>
+        
+        <div style="margin-bottom: 1rem;"></div>
+
+        <lightning-card title=" Related Child Implementations">
+            
+                <template if:true={Implementation}>
+                    <div style="border: 1px solid lightgray">
+                    <lightning-datatable data={Implementation}
+                                        columns={myColumnsImplementation}
+                                        key-field="Id"
+                                        hide-checkbox-column>
+                    </lightning-datatable>
+                    </div>
+                </template>
+                <template if:false={Implementation}>
+                    <div style="border: 2px solid lightgray">
+                        No Implementations to display.
+                    </div>
+                </template>
+            
+        </lightning-card>
+
+        <div style="margin-bottom: 1rem;"></div>
+        
+        <lightning-card title=" Related Child Opportunities">
+           
+                <template if:true={Opportunity}>
+                    <div style="border: 1px solid lightgray">
+                    <lightning-datatable data={Opportunity}
+                                        columns={mycolumnsopportunities}
+                                        key-field="Id"
+                                        hide-checkbox-column>
+                    </lightning-datatable>
+                    </div>
+                </template>
+                <template if:false={Opportunity}>
+                    <div style="border: 2px solid lightgray">
+                        No Opportunities to display.
+                    </div>
+                </template>
+            
+        </lightning-card>
+    
+</template>
+</template>
