@@ -1,0 +1,148 @@
+@isTest
+public class UpdateStateHandlerTest {
+
+
+    @isTest
+    static void testUpdateCountry() {
+        
+        List<Lead> leads = new List<Lead>();
+        Lead lead1 = new Lead(Country='USA', State='Alabama', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead6 = new Lead(Country='USA', State='Arkansas', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead7 = new Lead(Country='USA', State='California', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead8 = new Lead(Country='USA', State='Colorado', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead9 = new Lead(Country='USA', State='Connecticut', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead10 = new Lead(Country='USA', State='Columbia', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead11 = new Lead(Country='USA', State='Delaware', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead12 = new Lead(Country='USA', State='Georgia', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead13 = new Lead(Country='USA', State='Hawaii', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead14 = new Lead(Country='USA', State='Illinois', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead15 = new Lead(Country='USA', State='Iowa', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead16 = new Lead(Country='USA', State='Louisiana', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead17 = new Lead(Country='USA', State='Maine', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead18 = new Lead(Country='USA', State='Maryland', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead19 = new Lead(Country='USA', State='Massachusetts', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead20 = new Lead(Country='USA', State='Minnesota', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead21 = new Lead(Country='USA', State='Mississippi', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead22 = new Lead(Country='USA', State='Missouri', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead23 = new Lead(Country='USA', State='Montana', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead24 = new Lead(Country='USA', State='Nevada', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead25 = new Lead(Country='USA', State='New Hampshire', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead26 = new Lead(Country='USA', State='New Jersey', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead27 = new Lead(Country='USA', State='New Mexico', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead28 = new Lead(Country='USA', State='New York', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead29 = new Lead(Country='USA', State='N.Carolina', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead30 = new Lead(Country='USA', State='Ohio', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead31 = new Lead(Country='USA', State='Oklahoma', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead32 = new Lead(Country='usa', State='Pennsylvania', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead33 = new Lead(Country='USA', State='Rhode Island', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead34 = new Lead(Country='USA', State='S.Carolina', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+		Lead lead47 = new Lead(Country='USA', State='Utah', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead48 = new Lead(Country='USA', State='Vermont', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead49 = new Lead(Country='USA', State='Virginia', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead50 = new Lead(Country='USA', State='Washington', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead51 = new Lead(Country='USA', State='W.Virginia', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead52 = new Lead(Country='USA', State='Wisconsin', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead53 = new Lead(Country='USA', State='Wyoming', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        
+
+        
+        
+        
+        
+        Lead lead200 = new Lead(Country='Canada' ,State='Arkansas', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead201 = new Lead(Country='Canada' ,State='Alberta', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead202 = new Lead(Country='Canada' ,State='British Columbia', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead203 = new Lead(Country='Canada' ,State='Manitoba', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead204 = new Lead(Country='Canada' ,State='New Brunswick', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead205 = new Lead(Country='Canada' ,State='Newfoundland and Labrador', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead206 = new Lead(Country='Canada' ,State='Northwest Territories', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead207 = new Lead(Country='Canada' ,State='Nova Scotia', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead208 = new Lead(Country='Canada' ,State='Nunavut', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead209 = new Lead(Country='Canada' ,State='Ontario', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead210 = new Lead(Country='Canada' ,State='Prince Edward Island', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead211 = new Lead(Country='Canada' ,State='Quebec', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead212 = new Lead(Country='Canada' ,State='Saskatchewan', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Lead lead213 = new Lead(Country='Canada' ,State='Yukon', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+                
+        Lead lead300 = new Lead(Country='Other', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        
+        leads.add(lead1);       
+        leads.add(lead6);
+        leads.add(lead7);
+        leads.add(lead8);
+        leads.add(lead9);
+        leads.add(lead10);
+        leads.add(lead11);
+        leads.add(lead12);
+        leads.add(lead13);
+        leads.add(lead14);
+        leads.add(lead15);
+        leads.add(lead16);
+        leads.add(lead17);
+        leads.add(lead18);
+        leads.add(lead19);
+        leads.add(lead20);
+		leads.add(lead21);
+        leads.add(lead22);
+        leads.add(lead23);
+        leads.add(lead24);
+        leads.add(lead25);
+        leads.add(lead26);
+        leads.add(lead27);
+        leads.add(lead28);
+        leads.add(lead29);        
+        leads.add(lead30);
+        leads.add(lead31);
+        leads.add(lead32);
+        leads.add(lead33);
+        leads.add(lead34);
+        leads.add(lead47);
+        leads.add(lead48);
+        leads.add(lead49); 
+        leads.add(lead50);
+        leads.add(lead51);
+        leads.add(lead52);
+        leads.add(lead53);
+               
+        leads.add(lead201);
+        leads.add(lead202);
+        leads.add(lead203);
+        leads.add(lead204);
+        leads.add(lead205);
+        leads.add(lead206);
+        leads.add(lead207);
+        leads.add(lead208);
+        leads.add(lead209);
+        leads.add(lead210);
+        leads.add(lead211);
+        leads.add(lead212);
+        leads.add(lead213);
+        leads.add(lead300);
+        
+      //  insert leads;
+        
+        // Create a map of old leads
+        Map<Id, Lead> oldLeads = new Map<Id, Lead>();
+        for (Lead lead : leads) {
+            lead.Status = 'Demo Scheduled';
+            lead dupl = lead.clone();
+            dupl.State = 'Arkansas';
+            oldLeads.put(lead.Id, dupl);
+        }
+        
+        // Call the updateCountry method
+        UpdateStateHandler.updateCountry(leads, oldLeads);
+        UpdateStateHandler.updateState(leads, oldLeads);
+        UpdateStateHandler.checkValidation(leads);
+        
+        Lead lead400 = new Lead(Country='CA' ,State='Yukon', Status='New', FirstName = 'Test1', LastName = 'Last Name Test', Lead_Type__c = 'Inbound', LeadSource = 'Call');
+        Map<Id, Lead> oldLeads2 = new Map<Id, Lead>();
+        lead dupl = lead400.clone();
+        dupl.State = 'Alberta';
+        oldLeads2.put(lead400.Id , dupl);
+        
+        
+                   
+    }
+
+}
