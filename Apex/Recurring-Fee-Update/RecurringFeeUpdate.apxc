@@ -1,46 +1,81 @@
 public class UpdateRecurringFee {
     
     public static void RecurringFeeUpdate(List<OpportunityLineItem> newOpportunityLineItems, List<OpportunityLineItem> oldOpportunityLineItems, 
-                       Map<ID, OpportunityLineItem> newOpportunityMaps , Map<ID, OpportunityLineItem> oldOpportunityMaps) {
+                                          Map<ID, OpportunityLineItem> newOpportunityMaps , Map<ID, OpportunityLineItem> oldOpportunityMaps) 
+    {
         
-        // Get the Opportunity IDs from the new OpportunityLineItems list
+        
         Set<Id> opportunityIds = new Set<Id>();
         for (OpportunityLineItem o : newOpportunityLineItems) {
             opportunityIds.add(o.OpportunityId);
         }
         
-        // Query the OpportunityProducts related to the Opportunities
+        
         Map<Id, List<OpportunityLineItem>> opportunityProductMap = new Map<Id, List<OpportunityLineItem>>();
-        for (OpportunityLineItem oli : [SELECT Id, OpportunityId, Recurring_Fee_Monthly__c, Recurring_Fee_Annual__c FROM OpportunityLineItem WHERE OpportunityId IN :opportunityIds]) {
+        for (OpportunityLineItem oli : [SELECT Id, OpportunityId, Recurring_Fee_Monthly__c,TotalPrice, Recurring_Fee_Annual__c ,CB_Product_type__c,  Discount_Amount__c , ListPrice FROM OpportunityLineItem WHERE OpportunityId IN :opportunityIds]) {
             if (!opportunityProductMap.containsKey(oli.OpportunityId)) {
                 opportunityProductMap.put(oli.OpportunityId, new List<OpportunityLineItem>());
             }
             opportunityProductMap.get(oli.OpportunityId).add(oli);
         }
         
-        // Calculate the sum of all Recurring_Fee_Monthly__c and Recurring_Fee_Annual__c values on the OpportunityProducts
+         
         Map<Id, Decimal> recurringFeeMonthlyMap = new Map<Id, Decimal>();
         Map<Id, Decimal> recurringFeeAnnualMap = new Map<Id, Decimal>();
+        Map<Id, Decimal> TotalDiscount1styearMap = new Map<Id, Decimal>();
+        Map<Id, Decimal> ContractValueAfterDiscountsMap = new Map<Id, Decimal>();
+        Map<Id, Decimal> ImpFeeInvoiceMap = new Map<Id, Decimal>();
+        Map<Id, Decimal> FirstSubscriptionInvoiceMAP = new Map<Id, Decimal>();
+        
         for (Id opportunityId : opportunityProductMap.keySet()) {
             Decimal monthlySum = 0;
             Decimal annualSum = 0;
+            Decimal DiscountSum = 0;
+            Decimal ConValAfterDis = 0;
+            Decimal ImpFeeSum = 0;
+            Decimal FirstSubscriptionInvoiceSum = 0;
+            
             for (OpportunityLineItem oli : opportunityProductMap.get(opportunityId)) {
                 monthlySum += oli.Recurring_Fee_Monthly__c;
                 annualSum += oli.Recurring_Fee_Annual__c;
+                DiscountSum += oli.Discount_Amount__c;
+                
+                if(oli.CB_Product_type__c == 'CHARGE'){
+                    ConValAfterDis += oli.ListPrice;
+                    ImpFeeSum += oli.TotalPrice;
+                }else{
+                    ConValAfterDis += oli.Recurring_Fee_Annual__c;
+                    FirstSubscriptionInvoiceSum += oli.TotalPrice;
+                }
+                system.debug('------monthlySum= ' + oli.Recurring_Fee_Monthly__c);
+                system.debug('------annualSum= ' + oli.Recurring_Fee_Annual__c);
             }
+            
+            system.debug('------monthlySum= ' + monthlySum);
+            system.debug('------annualSum= ' + annualSum);
+            system.debug('-----------Opp name= ' + opportunityProductMap.get(opportunityId));
+            
             recurringFeeMonthlyMap.put(opportunityId, monthlySum);
             recurringFeeAnnualMap.put(opportunityId, annualSum);
+            TotalDiscount1styearMap.put(opportunityId , DiscountSum);
+            ContractValueAfterDiscountsMap.put(opportunityId , ConValAfterDis);
+            ImpFeeInvoiceMap.put(opportunityId , ImpFeeSum);
+            FirstSubscriptionInvoiceMAP.put(opportunityId , FirstSubscriptionInvoiceSum);
         }
-        
-        // Update the Opportunity with the calculated Recurring_Fee_Monthly__c and Recurring_Fee_Annual__c values
+      
         List<Opportunity> opportunitiesToUpdate = new List<Opportunity>();
         for (Opportunity opp : [SELECT Id, Recurring_Fee_Monthly__c, Recurring_Fee_Annual__c FROM Opportunity WHERE Id IN :opportunityIds]) {
             if (recurringFeeMonthlyMap.containsKey(opp.Id)) {
                 opp.Recurring_Fee_Monthly__c = recurringFeeMonthlyMap.get(opp.Id);
                 opp.Recurring_Fee_Annual__c = recurringFeeAnnualMap.get(opp.Id);
+                opp.Total_Discount_1st_year__c = TotalDiscount1styearMap.get(opp.Id);
+                opp.Implementation_Fee_Invoice__c = ImpFeeInvoiceMap.get(opp.Id);
+                opp.X1st_Year_Contract_Value_after_discounts__c = ContractValueAfterDiscountsMap.get(opp.Id) - TotalDiscount1styearMap.get(opp.Id);
+                opp.X1st_Subscription_Invoice__c = FirstSubscriptionInvoiceMAP.get(opp.Id);
                 opportunitiesToUpdate.add(opp);
             }
         }
         update opportunitiesToUpdate;
+        
     }
 }
