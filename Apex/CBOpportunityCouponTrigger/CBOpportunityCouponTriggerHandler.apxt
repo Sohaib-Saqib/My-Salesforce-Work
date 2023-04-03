@@ -1,0 +1,81 @@
+public class CBOpportunityCouponTriggerHandler {
+    
+    public static void UpdateCoupon(List<chargebeeapps__CB_Opportunity_Coupon__c> newCoupons) {
+        
+        Set<Id> oppIds = new Set<Id>();
+        for (chargebeeapps__CB_Opportunity_Coupon__c coupon : newCoupons) {
+            oppIds.add(coupon.chargebeeapps__Opportunity__c);
+        }
+        
+        system.debug('XXXXXXXXXXXXXXXXXXXXX CBOpportunityCouponTriggerHandler  called ' );
+        Map<Id, List<id>> oppToCoupons = new Map<Id, List<String>>();
+        for (OpportunityLineItem lineItem : [
+            SELECT Product2Id, Product2.CB_Coupon_1__c, Product2.CB_Coupon_2__c,
+            OpportunityId
+            FROM OpportunityLineItem
+            WHERE OpportunityId IN :oppIds
+        ]) {
+            List<String> coupons = new List<String>();
+            if (lineItem.Product2.CB_Coupon_1__c != null) {
+                coupons.add(lineItem.Product2.CB_Coupon_1__c);
+                
+            }
+            if (lineItem.Product2.CB_Coupon_2__c != null) {
+                coupons.add(lineItem.Product2.CB_Coupon_2__c);
+            }
+            oppToCoupons.put(lineItem.OpportunityId, coupons);
+        }
+        
+        
+        system.debug('XXXXXXXXXXXXXXXXXXXXX at step 2 ' );
+        List<OpportunityLineItem> updatedLineItems = new List<OpportunityLineItem>();
+        for (OpportunityLineItem lineItem : [
+            SELECT Id, CB_Coupon__c, CB_Coupon2__c,
+            Product2Id,OpportunityId, Product2.CB_Coupon_1__c, Product2.CB_Coupon_2__c
+            FROM OpportunityLineItem
+            WHERE OpportunityId IN :oppIds
+        ]) {
+            system.debug('XXXXXXXXXXXXXXXXXXXXX at step 3 ' );
+            List<id> coupons = oppToCoupons.get(lineItem.OpportunityId);
+            if (coupons != null) {
+                system.debug('XXXXXXXXXXXXXXXXXXXXX at step 4 ' );
+                
+                
+                if (lineItem.Product2.CB_Coupon_1__c == coupons[0] || lineItem.Product2.CB_Coupon_2__c == coupons[0]) {
+                 
+                    if(lineItem.Product2.CB_Coupon_1__c == coupons[0]){
+                        lineItem.CB_Coupon__c = lineItem.Product2.CB_Coupon_1__c;
+                        system.debug('XXXXXXXXXXXXXXXXXXXXX1 lineItem.CB_Coupon__c ==  ' + lineItem.CB_Coupon__c);
+                        system.debug('XXXXXXXXXXXXXXXXXXXXX1 lineItem.Product2.CB_Coupon_1__c ==  ' + lineItem.Product2.CB_Coupon_1__c);
+                    }else{
+                        lineItem.CB_Coupon2__c = lineItem.Product2.CB_Coupon_1__c;
+                    }
+                    
+                }
+                if(coupons[1] != NULL){
+                     if (lineItem.Product2.CB_Coupon_1__c == coupons[1] || lineItem.Product2.CB_Coupon_2__c == coupons[1]) {
+                        
+                        if(lineItem.Product2.CB_Coupon_1__c == coupons[1]){
+                            lineItem.CB_Coupon__c = lineItem.Product2.CB_Coupon_1__c;
+                            system.debug('XXXXXXXXXXXXXXXXXXXXX2 lineItem.CB_Coupon__c ==  ' + lineItem.CB_Coupon__c);
+                            system.debug('XXXXXXXXXXXXXXXXXXXXX2 lineItem.Product2.CB_Coupon_1__c ==  ' + lineItem.Product2.CB_Coupon_1__c);
+                        }else{
+                            lineItem.CB_Coupon2__c = lineItem.Product2.CB_Coupon_1__c;
+                        }
+                        
+                    }
+                
+                }
+                   
+                
+                updatedLineItems.add(lineItem);
+            }
+        }
+        system.debug('XXXXXXXXXXXXXXXXXXXXX at step 5 ' );
+        // Update the OpportunityLineItems
+        if (!updatedLineItems.isEmpty()) {
+            system.debug('XXXXXXXXXXXXXXXXXXXXX at step 6 ' );
+            update updatedLineItems;
+        }
+    }
+}
