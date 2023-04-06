@@ -1,0 +1,61 @@
+public void SkipIntercomTask(List<Account> newAccounts, List<Account> oldAccounts, Map<ID, Account> newAccountMaps, Map<ID, Account> oldAccountMaps) {
+        Set<Id> accountIds = new Set<Id>();
+        for (Account newAcc : newAccounts) {
+            accountIds.add(newAcc.Id);
+        }
+        
+        Map<Id, Task> taskMap = new Map<Id, Task>();
+        for(Account a : newAccounts){
+         /*  Task temp = [SELECT Id, Subject, ActivityDate, Type, WhatId  FROM Task   WHERE WhatId = :a.id AND Status = 'Completed' ORDER BY LastModifiedDate DESC LIMIT 1];
+
+            taskMap.put(a.Id, temp);
+            system.debug('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXxxxxx Task Name: '+ temp.Subject + ' Account Name: '+ a.Name);
+            if(temp != NULL){
+                String sub = temp.Subject.toLowerCase();
+                if(sub.contains('intercom') || temp.Type == 'Intercom Chat' || sub.contains('chat') ){
+                    a.LastActivityDate__c = oldAccountMaps.get(a.Id).LastActivityDate__c;
+                }else{
+                    if(temp.ActivityDate > a.Activation_Date__c ){
+                        a.LastActivityDate__c = temp.ActivityDate;
+                        
+                    }else{
+                   //     a.LastActivityDate__c = a.LastActivityDate;
+                    }
+
+}
+}*/
+            String TaskName = '%' + 'intercom' +'%';
+            List<Task> task = [
+                SELECT Id, Subject, ActivityDate, Type, WhatId
+                FROM Task
+                WHERE 
+                WhatId = :a.Id 
+                AND Status = 'Completed' 
+                AND (
+                    Type = 'Intercom Chat' 
+                    OR Subject LIKE :TaskName
+                )
+                ORDER BY ActivityDate DESC
+                
+            ];
+            
+            List<Task> latestCompletedTask = [
+                SELECT Id, Subject, ActivityDate, Type, WhatId
+                FROM Task
+                WHERE 
+                WhatId = :a.Id 
+                AND Status = 'Completed' 
+                AND Id NOT IN :task 
+                ORDER BY LastModifiedDate DESC
+                LIMIT 1
+            ];
+            
+            if(latestCompletedTask.size() > 0 ){
+                if(latestCompletedTask[0].ActivityDate != NULL){
+                    a.LastActivityDate__c = latestCompletedTask[0].ActivityDate;
+                }               
+            }else{
+                a.LastActivityDate__c = NULL;
+            }
+        }    
+    }
