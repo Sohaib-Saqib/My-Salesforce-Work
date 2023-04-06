@@ -44,11 +44,14 @@ public void SkipIntercomTask(List<Account> newAccounts, List<Account> oldAccount
                 FROM Task
                 WHERE 
                 WhatId = :a.Id 
-                AND Status = 'Completed' 
+                AND Status = 'Completed'
+                AND ActivityDate != NULL
                 AND Id NOT IN :task 
-                ORDER BY LastModifiedDate DESC
+                ORDER BY ActivityDate DESC
                 LIMIT 1
             ];
+            
+        //    System.debug('XXXXXXXXXXXXXXXXXXXXXXXXx latestCompletedTask: '+latestCompletedTask[0].Subject);
             
             if(latestCompletedTask.size() > 0 ){
                 if(latestCompletedTask[0].ActivityDate != NULL){
@@ -59,3 +62,4 @@ public void SkipIntercomTask(List<Account> newAccounts, List<Account> oldAccount
             }
         }    
     }
+    
