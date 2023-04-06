@@ -1,0 +1,29 @@
+public void SkipIntercomTask(List<Account> newAccounts, List<Account> oldAccounts, Map<ID, Account> newAccountMaps, Map<ID, Account> oldAccountMaps) {
+    // Create a set of account IDs
+    Set<Id> accountIds = new Set<Id>();
+    for (Account newAcc : newAccounts) {
+        accountIds.add(newAcc.Id);
+    }
+    
+    // Query for relevant tasks for the accounts in the newAccounts list
+    List<Task> tasks = [        SELECT Id, Subject, ActivityDate, Type, WhatId        FROM Task        WHERE         WhatId IN :accountIds         AND Status = 'Completed'         AND (            Type = 'Intercom Chat'             OR Subject LIKE '%intercom%'            OR Subject LIKE '%chat%'        )        ORDER BY ActivityDate DESC    ];
+    
+    // Create a map of account IDs to their most recent completed task
+    Map<Id, Task> taskMap = new Map<Id, Task>();
+    for(Task t : tasks) {
+        if (!taskMap.containsKey(t.WhatId)) {
+            taskMap.put(t.WhatId, t);
+        }
+    }
+    
+    // Loop through the newAccounts list and update the LastActivityDate__c field
+    for(Account a : newAccounts){
+        Task mostRecentTask = taskMap.get(a.Id);
+        
+        if(mostRecentTask != null && mostRecentTask.ActivityDate != null){
+            a.LastActivityDate__c = mostRecentTask.ActivityDate;
+        } else {
+            a.LastActivityDate__c = null;
+        }
+    }
+}
