@@ -1,0 +1,80 @@
+@IsTest
+private class CBOpportunityCouponTriggerHandlerTest {
+    @TestSetup
+    static void Setup() {
+        
+        Account acc = new Account(Name = 'Test Account 111');
+        insert acc;
+        
+        Opportunity opp = new Opportunity(
+            Name = 'Test Opportunity',
+            StageName = 'Prospecting',
+            CloseDate = Date.today(),
+            AccountId = acc.id
+        );
+        insert opp;
+        
+      
+        Pricebook2 pb2 = new Pricebook2(Name = 'Test Pricebook2', IsActive = true);
+        insert pb2;
+        
+        Product2 prod = new Product2(
+            Name = 'Test Product 111',
+            IsActive = true,
+            CurrencyIsoCode = 'USD',
+            chargebeeapps__Product_Type__c = 'CHARGE',
+            Billing_Frequency__c = 'Monthly'
+        );
+        insert prod;
+        
+       
+        Id standardPricebookId = Test.getStandardPricebookId();
+        
+        
+        PricebookEntry stdPrice = new PricebookEntry(
+            Pricebook2Id = standardPricebookId,
+            Product2Id = prod.Id,
+            UnitPrice = 100.00,
+            IsActive = true 
+        );
+        insert stdPrice;
+        
+      
+        PricebookEntry customPrice = new PricebookEntry(
+            Pricebook2Id = pb2.Id,
+            Product2Id = prod.Id,
+            UnitPrice = 80.00,
+            IsActive = true 
+        );
+        insert customPrice;
+        
+        OpportunityLineItem oli = new OpportunityLineItem(
+            OpportunityId = opp.Id,
+            PricebookEntryId = customPrice.Id, 
+            Quantity = 1,
+            TotalPrice  = 80.00 
+        );
+        insert oli;
+        
+        chargebeeapps__Coupon__c coupon = new chargebeeapps__Coupon__c(chargebeeapps__Coupon_Id__c = 'autoleapinc-test_ms-adv-seo-monit-mgt-CAD-108' ,Name = 'Adv. SEO Monitoring & Mgmt. Discount: C$108' ,
+                                                                              chargebeeapps__Status__c = 'ACTIVE', CurrencyIsoCode = 'USD' ,
+                                                                             chargebeeapps__Discount_Type__c = 'PERCENTAGE' , chargebeeapps__Duration_Type__c = 'ONE_TIME' , 
+                                                                              chargebeeapps__Discount_Percentage__c = 0.5);
+        insert coupon;
+        chargebeeapps__CB_Opportunity_Coupon__c OPC = new chargebeeapps__CB_Opportunity_Coupon__c (chargebeeapps__CB_Coupon__c = coupon.id , Name = 'Test 111' , CurrencyIsoCode = 'USD', 
+                                                                                                  chargebeeapps__Opportunity__c = opp.id);
+        insert OPC;
+    }
+    
+    @IsTest
+    static void testRecurringFeeUpdate() {
+        Opportunity opp = [Select id from Opportunity where Name = 'Test Opportunity' limit 1];
+        List<OpportunityLineItem> oli = [Select id from OpportunityLineItem where OpportunityId = :opp.id];
+        List<chargebeeapps__CB_Opportunity_Coupon__c> opc = [Select id from chargebeeapps__CB_Opportunity_Coupon__c where name = 'Test 111'];
+        Test.startTest();
+    //    CBOpportunityCouponTriggerHandler.RecurringFeeUpdate(oli);
+        CBOpportunityCouponTriggerHandler.UpdateCoupon(opc);
+        Test.stopTest();
+    }
+    
+}
