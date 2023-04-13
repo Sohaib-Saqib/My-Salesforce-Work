@@ -97,15 +97,7 @@ public class UpdateRecurringFeeTest {
         insert oli;
         
         
-       /* OpportunityLineItem oli2 = new OpportunityLineItem(
-            OpportunityId = opp.Id,
-            PricebookEntryId = customPrice2.Id, 
-            Quantity = 1,
-            TotalPrice  = 80.00 ,
-            CB_Coupon__c = coupon.id , 
-            CB_Coupon2__c = coupon.id
-        );
-        insert oli2;*/
+       
        
         chargebeeapps__CB_Opportunity_Coupon__c OPC = new chargebeeapps__CB_Opportunity_Coupon__c (chargebeeapps__CB_Coupon__c = coupon.id , Name = 'Test 111' , CurrencyIsoCode = 'USD', 
                                                                                                    chargebeeapps__Opportunity__c = opp.id);
