@@ -8,7 +8,7 @@ public class UpdateRecurringFeeTest {
       
          chargebeeapps__Coupon__c coupon = new chargebeeapps__Coupon__c(chargebeeapps__Coupon_Id__c = 'autoleapinc-test_alpro-td-50%off-3mo' ,Name = 'Tirecraft Discount: 50% off 1st 3 months' ,
                                                                        chargebeeapps__Status__c = 'ACTIVE', CurrencyIsoCode = 'USD' ,
-                                                                       chargebeeapps__Discount_Type__c = 'PERCENTAGE' , chargebeeapps__Duration_Type__c = 'ONE_TIME' , 
+                                                                       chargebeeapps__Discount_Type__c = 'PERCENTAGE' , chargebeeapps__Duration_Type__c = 'FOREVER' , 
                                                                        chargebeeapps__Discount_Percentage__c = 0.5);
         insert coupon;
         
