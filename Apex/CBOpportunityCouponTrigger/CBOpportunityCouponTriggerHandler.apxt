@@ -3,7 +3,7 @@ public class CBOpportunityCouponTriggerHandler {
     public static void RecurringFeeUpdate(List<OpportunityLineItem> newOpportunityLineItems) 
     {
         
-    //    System.debug('RecurringFeeUpdate ------------------------> Start');
+        //    System.debug('RecurringFeeUpdate ------------------------> Start');
         
         Set<Id> opportunityIds = new Set<Id>();
         Set<Id> opportunityLineIds = new Set<Id>();
@@ -85,9 +85,9 @@ public class CBOpportunityCouponTriggerHandler {
                 opportunitiesToUpdate.add(opp);
             }
         }
-  //      System.debug('Opp to update ------------------------> ' + opportunitiesToUpdate.size());
-//        System.debug('Opp to update ------------------------> ' + opportunitiesToUpdate);
-   //     System.debug('RecurringFeeUpdate ------------------------> End');
+        //      System.debug('Opp to update ------------------------> ' + opportunitiesToUpdate.size());
+        //        System.debug('Opp to update ------------------------> ' + opportunitiesToUpdate);
+        //     System.debug('RecurringFeeUpdate ------------------------> End');
         update opportunitiesToUpdate;
         
     }
@@ -116,53 +116,48 @@ public class CBOpportunityCouponTriggerHandler {
             System.debug('XXXXXXXXXXXX  Step 2');
             
             
-            Map<Id, Product2> productsMap = new Map<Id, Product2>([SELECT Id,Name, CB_Coupon_1__c, CB_Coupon_2__c FROM Product2 WHERE Id IN :productIds]);
+            Map<Id, Product2> productsMap = new Map<Id, Product2>([SELECT Id, Name, CB_Coupon_1__c, CB_Coupon_2__c, CB_Coupon_3__c, CB_Coupon_4__c, CB_Coupon_5__c FROM Product2 WHERE Id IN :productIds]);
             
             for (OpportunityLineItem oliLoop : oli) {
                 Product2 p = productsMap.get(oliLoop.Product2Id);
                 
                 
-                System.debug('XXXXXXXXXXXX  Step 3');
-                //  o.CB_Coupon__c = p.CB_Coupon_1__c.id;
-                System.debug('XXXXXXXXXXXX  Product,Name: '+p.name);
                 
-                if (p.CB_Coupon_1__c != null && p.CB_Coupon_2__c != null){
+                if (p.CB_Coupon_1__c != null && p.CB_Coupon_2__c != null && p.CB_Coupon_3__c != null && p.CB_Coupon_4__c != null && p.CB_Coupon_5__c != null) {
                     chargebeeapps__Coupon__c cp1 = [select id , Name from chargebeeapps__Coupon__c where id = :p.CB_Coupon_1__c];
-                    
                     chargebeeapps__Coupon__c cp2 = [select id , Name from chargebeeapps__Coupon__c where id = :p.CB_Coupon_2__c];
+                    chargebeeapps__Coupon__c cp3 = [select id , Name from chargebeeapps__Coupon__c where id = :p.CB_Coupon_3__c];
+                    chargebeeapps__Coupon__c cp4 = [select id , Name from chargebeeapps__Coupon__c where id = :p.CB_Coupon_4__c];
+                    chargebeeapps__Coupon__c cp5 = [select id , Name from chargebeeapps__Coupon__c where id = :p.CB_Coupon_5__c];
                     
                     chargebeeapps__Coupon__c coupon2 = [SELECT Id, Name FROM chargebeeapps__Coupon__c WHERE Id = :co.chargebeeapps__CB_Coupon__c];
-                    system.debug('XXXXXXXXXXXX coupon2.Name= '+ coupon2.Name);
-                    system.debug('XXXXXXXXXXXX cp1.Name= '+ cp1.Name);
-                    system.debug('XXXXXXXXXXXX cp2.Name= '+ cp2.Name);
+                    
+                    
                     
                     if(coupon2.Name == cp1.Name){
                         oliLoop.CB_Coupon__c = cp1.id;
-                        
-                        System.debug('XXXXXXXXXXXX  Succcess here '+ cp1.id +' Added on '+p.name);
                     }
                     if(coupon2.Name == cp2.Name){
                         oliLoop.CB_Coupon2__c = cp2.id;
-                        
-                        System.debug('XXXXXXXXXXXX  Succcess here '+ cp2.id +' Added on '+p.name);
+                    }
+                    if(coupon2.Name == cp3.Name){
+                        oliLoop.CB_Coupon3__c = cp3.id;
+                    }
+                    if(coupon2.Name == cp4.Name){
+                        oliLoop.CB_Coupon4__c = cp4.id;
+                    }
+                    if(coupon2.Name == cp5.Name){
+                        oliLoop.CB_Coupon5__c = cp5.id;
                     }
                     if (!uniqueIds.contains(oliLoop.Id)) {
                         updateOli.add(oliLoop);
                         uniqueIds.add(oliLoop.Id);
-                        System.debug('XXXXXXXXXXXX  oppProd added for updating named: '+p.name);
                     }
-                  /*  if(isAdded = true){
-                        updateOli.add(oliLoop);
-                    System.debug('XXXXXXXXXXXX  Step 4 Final');
-                    }*/
-                    
                 }
             }
-
+            
+            update updateOli;
+            RecurringFeeUpdate(oli);
         }
-
-        update updateOli;
-        RecurringFeeUpdate(oli);
-        System.debug('XXXXXXXXXXXX  Updation complete' );
     }
 }
