@@ -1,81 +1,168 @@
 public class CBOpportunityCouponTriggerHandler {
     
+    public static void RecurringFeeUpdate(List<OpportunityLineItem> newOpportunityLineItems) 
+    {
+        
+    //    System.debug('RecurringFeeUpdate ------------------------> Start');
+        
+        Set<Id> opportunityIds = new Set<Id>();
+        Set<Id> opportunityLineIds = new Set<Id>();
+        List<OpportunityLineItem> oliLoop = [Select id, OpportunityId from OpportunityLineItem where id in :newOpportunityLineItems];
+        for (OpportunityLineItem o : oliLoop) {
+            opportunityIds.add(o.OpportunityId);
+            opportunityLineIds.add(o.Id);
+        }
+        
+        
+        Map<Id, List<OpportunityLineItem>> opportunityProductMap = new Map<Id, List<OpportunityLineItem>>();
+        for (OpportunityLineItem oli :
+             [SELECT Id,Discount_Amount2__c, OpportunityId, Recurring_Fee_Monthly__c,TotalPrice, Recurring_Fee_Annual__c ,CB_Product_type__c,  Discount_Amount__c , ListPrice
+              FROM OpportunityLineItem WHERE OpportunityId IN :opportunityIds])
+        {
+            if (!opportunityProductMap.containsKey(oli.OpportunityId))
+            {
+                opportunityProductMap.put(oli.OpportunityId, new List<OpportunityLineItem>());
+            }
+            opportunityProductMap.get(oli.OpportunityId).add(oli);
+        }
+        
+        Map<Id, Decimal> recurringFeeMonthlyMap = new Map<Id, Decimal>();
+        Map<Id, Decimal> recurringFeeAnnualMap = new Map<Id, Decimal>();
+        Map<Id, Decimal> TotalDiscount1styearMap = new Map<Id, Decimal>();
+        Map<Id, Decimal> ContractValueAfterDiscountsMap = new Map<Id, Decimal>();
+        Map<Id, Decimal> ImpFeeInvoiceMap = new Map<Id, Decimal>();
+        Map<Id, Decimal> FirstSubscriptionInvoiceMAP = new Map<Id, Decimal>();
+        //    Map<Id, Decimal> TotalDiscountwithCouponsMap = new Map<Id, Decimal>();
+        
+        
+        for (Id opportunityId : opportunityProductMap.keySet()) 
+        {
+            Decimal monthlySum = 0;
+            Decimal annualSum = 0;
+            Decimal DiscountSum = 0;
+            Decimal ConValAfterDis = 0;
+            Decimal ImpFeeSum = 0;
+            //      Decimal TotalDiscountwithCouponsSum = 0;
+            Decimal FirstSubscriptionInvoiceSum = 0;
+            
+            for (OpportunityLineItem oli : opportunityProductMap.get(opportunityId)) 
+            {
+                monthlySum += oli.Recurring_Fee_Monthly__c;
+                annualSum += oli.Recurring_Fee_Annual__c;
+                
+                DiscountSum += oli.Discount_Amount2__c;
+                if(oli.CB_Product_type__c == 'CHARGE')
+                {
+                    ConValAfterDis += oli.ListPrice;
+                    ImpFeeSum += oli.TotalPrice;
+                }
+                else
+                {
+                    ConValAfterDis += oli.Recurring_Fee_Annual__c;
+                    FirstSubscriptionInvoiceSum += oli.TotalPrice;
+                }
+                
+            }
+            
+            recurringFeeMonthlyMap.put(opportunityId, monthlySum);
+            recurringFeeAnnualMap.put(opportunityId, annualSum);
+            TotalDiscount1styearMap.put(opportunityId , DiscountSum);
+            ContractValueAfterDiscountsMap.put(opportunityId , ConValAfterDis);
+            ImpFeeInvoiceMap.put(opportunityId , ImpFeeSum);
+            FirstSubscriptionInvoiceMAP.put(opportunityId , FirstSubscriptionInvoiceSum);
+        }
+        
+        List<Opportunity> opportunitiesToUpdate = new List<Opportunity>();
+        for (Opportunity opp : [SELECT Id, Recurring_Fee_Monthly__c, Recurring_Fee_Annual__c FROM Opportunity WHERE Id IN :opportunityIds]) {
+            if (recurringFeeMonthlyMap.containsKey(opp.Id)) {
+                opp.Recurring_Fee_Monthly__c = recurringFeeMonthlyMap.get(opp.Id);
+                opp.Recurring_Fee_Annual__c = recurringFeeAnnualMap.get(opp.Id);
+                opp.Total_Discount_1st_year__c = TotalDiscount1styearMap.get(opp.Id);
+                opp.Implementation_Fee_Invoice__c = ImpFeeInvoiceMap.get(opp.Id);
+                opp.X1st_Year_Contract_Value_after_discounts__c = ContractValueAfterDiscountsMap.get(opp.Id) - TotalDiscount1styearMap.get(opp.Id);
+                opp.X1st_Subscription_Invoice__c = FirstSubscriptionInvoiceMAP.get(opp.Id);
+                //      opp.Total_Discount_with_Coupons__c = FirstSubscriptionInvoiceMAP.get(opp.Id);
+                opportunitiesToUpdate.add(opp);
+            }
+        }
+  //      System.debug('Opp to update ------------------------> ' + opportunitiesToUpdate.size());
+//        System.debug('Opp to update ------------------------> ' + opportunitiesToUpdate);
+   //     System.debug('RecurringFeeUpdate ------------------------> End');
+        update opportunitiesToUpdate;
+        
+    }
+    
+    
     public static void UpdateCoupon(List<chargebeeapps__CB_Opportunity_Coupon__c> newCoupons) {
         
+        System.debug('XXXXXXXXXXXXXXX  Step 1');
         Set<Id> oppIds = new Set<Id>();
-        for (chargebeeapps__CB_Opportunity_Coupon__c coupon : newCoupons) {
+        List<OpportunityLineItem> updateOli = new List<OpportunityLineItem>();
+        Set<id> uniqueIds = new Set<id>();
+        List<chargebeeapps__CB_Opportunity_Coupon__c> CouponForLoop = [Select id, chargebeeapps__Opportunity__c from chargebeeapps__CB_Opportunity_Coupon__c where id in :newCoupons];
+        for (chargebeeapps__CB_Opportunity_Coupon__c coupon : CouponForLoop) {
             oppIds.add(coupon.chargebeeapps__Opportunity__c);
         }
-        
-        system.debug('XXXXXXXXXXXXXXXXXXXXX CBOpportunityCouponTriggerHandler  called ' );
-        Map<Id, List<id>> oppToCoupons = new Map<Id, List<String>>();
-        for (OpportunityLineItem lineItem : [
-            SELECT Product2Id, Product2.CB_Coupon_1__c, Product2.CB_Coupon_2__c,
-            OpportunityId
-            FROM OpportunityLineItem
-            WHERE OpportunityId IN :oppIds
-        ]) {
-            List<String> coupons = new List<String>();
-            if (lineItem.Product2.CB_Coupon_1__c != null) {
-                coupons.add(lineItem.Product2.CB_Coupon_1__c);
-                
+        List<OpportunityLineItem> oli = [SELECT Id, CB_Coupon__c, CB_Coupon2__c, Product2Id, OpportunityId FROM OpportunityLineItem WHERE OpportunityId IN :oppIds];
+        for (chargebeeapps__CB_Opportunity_Coupon__c co : newCoupons) {
+            
+            
+            
+            
+            Set<Id> productIds = new Set<Id>();
+            for (OpportunityLineItem o : oli) {
+                productIds.add(o.Product2Id);
             }
-            if (lineItem.Product2.CB_Coupon_2__c != null) {
-                coupons.add(lineItem.Product2.CB_Coupon_2__c);
-            }
-            oppToCoupons.put(lineItem.OpportunityId, coupons);
-        }
-        
-        
-        system.debug('XXXXXXXXXXXXXXXXXXXXX at step 2 ' );
-        List<OpportunityLineItem> updatedLineItems = new List<OpportunityLineItem>();
-        for (OpportunityLineItem lineItem : [
-            SELECT Id, CB_Coupon__c, CB_Coupon2__c,
-            Product2Id,OpportunityId, Product2.CB_Coupon_1__c, Product2.CB_Coupon_2__c
-            FROM OpportunityLineItem
-            WHERE OpportunityId IN :oppIds
-        ]) {
-            system.debug('XXXXXXXXXXXXXXXXXXXXX at step 3 ' );
-            List<id> coupons = oppToCoupons.get(lineItem.OpportunityId);
-            if (coupons != null) {
-                system.debug('XXXXXXXXXXXXXXXXXXXXX at step 4 ' );
+            System.debug('XXXXXXXXXXXX  Step 2');
+            
+            
+            Map<Id, Product2> productsMap = new Map<Id, Product2>([SELECT Id,Name, CB_Coupon_1__c, CB_Coupon_2__c FROM Product2 WHERE Id IN :productIds]);
+            
+            for (OpportunityLineItem oliLoop : oli) {
+                Product2 p = productsMap.get(oliLoop.Product2Id);
                 
                 
-                if (lineItem.Product2.CB_Coupon_1__c == coupons[0] || lineItem.Product2.CB_Coupon_2__c == coupons[0]) {
-                 
-                    if(lineItem.Product2.CB_Coupon_1__c == coupons[0]){
-                        lineItem.CB_Coupon__c = lineItem.Product2.CB_Coupon_1__c;
-                        system.debug('XXXXXXXXXXXXXXXXXXXXX1 lineItem.CB_Coupon__c ==  ' + lineItem.CB_Coupon__c);
-                        system.debug('XXXXXXXXXXXXXXXXXXXXX1 lineItem.Product2.CB_Coupon_1__c ==  ' + lineItem.Product2.CB_Coupon_1__c);
-                    }else{
-                        lineItem.CB_Coupon2__c = lineItem.Product2.CB_Coupon_1__c;
+                System.debug('XXXXXXXXXXXX  Step 3');
+                //  o.CB_Coupon__c = p.CB_Coupon_1__c.id;
+                System.debug('XXXXXXXXXXXX  Product,Name: '+p.name);
+                
+                if (p.CB_Coupon_1__c != null && p.CB_Coupon_2__c != null){
+                    chargebeeapps__Coupon__c cp1 = [select id , Name from chargebeeapps__Coupon__c where id = :p.CB_Coupon_1__c];
+                    
+                    chargebeeapps__Coupon__c cp2 = [select id , Name from chargebeeapps__Coupon__c where id = :p.CB_Coupon_2__c];
+                    
+                    chargebeeapps__Coupon__c coupon2 = [SELECT Id, Name FROM chargebeeapps__Coupon__c WHERE Id = :co.chargebeeapps__CB_Coupon__c];
+                    system.debug('XXXXXXXXXXXX coupon2.Name= '+ coupon2.Name);
+                    system.debug('XXXXXXXXXXXX cp1.Name= '+ cp1.Name);
+                    system.debug('XXXXXXXXXXXX cp2.Name= '+ cp2.Name);
+                    
+                    if(coupon2.Name == cp1.Name){
+                        oliLoop.CB_Coupon__c = cp1.id;
+                        
+                        System.debug('XXXXXXXXXXXX  Succcess here '+ cp1.id +' Added on '+p.name);
                     }
+                    if(coupon2.Name == cp2.Name){
+                        oliLoop.CB_Coupon2__c = cp2.id;
+                        
+                        System.debug('XXXXXXXXXXXX  Succcess here '+ cp2.id +' Added on '+p.name);
+                    }
+                    if (!uniqueIds.contains(oliLoop.Id)) {
+                        updateOli.add(oliLoop);
+                        uniqueIds.add(oliLoop.Id);
+                        System.debug('XXXXXXXXXXXX  oppProd added for updating named: '+p.name);
+                    }
+                  /*  if(isAdded = true){
+                        updateOli.add(oliLoop);
+                    System.debug('XXXXXXXXXXXX  Step 4 Final');
+                    }*/
                     
                 }
-                if(coupons[1] != NULL){
-                     if (lineItem.Product2.CB_Coupon_1__c == coupons[1] || lineItem.Product2.CB_Coupon_2__c == coupons[1]) {
-                        
-                        if(lineItem.Product2.CB_Coupon_1__c == coupons[1]){
-                            lineItem.CB_Coupon__c = lineItem.Product2.CB_Coupon_1__c;
-                            system.debug('XXXXXXXXXXXXXXXXXXXXX2 lineItem.CB_Coupon__c ==  ' + lineItem.CB_Coupon__c);
-                            system.debug('XXXXXXXXXXXXXXXXXXXXX2 lineItem.Product2.CB_Coupon_1__c ==  ' + lineItem.Product2.CB_Coupon_1__c);
-                        }else{
-                            lineItem.CB_Coupon2__c = lineItem.Product2.CB_Coupon_1__c;
-                        }
-                        
-                    }
-                
-                }
-                   
-                
-                updatedLineItems.add(lineItem);
             }
+
         }
-        system.debug('XXXXXXXXXXXXXXXXXXXXX at step 5 ' );
-        // Update the OpportunityLineItems
-        if (!updatedLineItems.isEmpty()) {
-            system.debug('XXXXXXXXXXXXXXXXXXXXX at step 6 ' );
-            update updatedLineItems;
-        }
+
+        update updateOli;
+        RecurringFeeUpdate(oli);
+        System.debug('XXXXXXXXXXXX  Updation complete' );
     }
 }
