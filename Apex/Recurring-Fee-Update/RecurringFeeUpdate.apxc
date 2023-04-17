@@ -1,59 +1,176 @@
 public class UpdateRecurringFee {
     
+    
+    public static void updateDiscount(List<OpportunityLineItem> newOpportunityLineItems,List<OpportunityLineItem> oldOpportunityLineItems, 
+                                      Map<ID, OpportunityLineItem> newOpportunityMaps , Map<ID, OpportunityLineItem> oldOpportunityMaps)
+    {
+        System.debug('updateDiscount ------------------------> Start');
+        Decimal ARR;
+        ARR = 0;
+        
+        if(newOpportunityLineItems != NULL)
+        {
+            List<OpportunityLineItem> forLoppOLI = [Select id,CB_Coupon2__c,CB_Coupon__c,Discount_Amount2__c,ListPrice,TotalPrice,CB_Product_type__c from  
+                                                    OpportunityLineItem where id in :newOpportunityLineItems];
+            for (OpportunityLineItem oli : newOpportunityLineItems) // replaced with newOpportunityLineItems  forLoppOLI
+            {
+                //system.debug('OLI ----> ' + oli);
+                //system.debug('OLI CB_Product_type__c ----> ' + oli.CB_Product_type__c);
+                //system.debug('OLI CB_Coupon__c ----> ' + oli.CB_Coupon__c);
+                //system.debug('OLI CB_Coupon2__c ----> ' + oli.CB_Coupon2__c);
+                ARR = 0;
+                oli.Discount_Amount2__c = 0;
+                if(oli.CB_Product_type__c == 'CHARGE')
+                {
+                    if( oli.ListPrice != null && oli.TotalPrice != null)
+                    {
+                        //system.debug('List Price --> '+ oli.ListPrice );
+                        //system.debug('Total Price --> '+ oli.TotalPrice );
+                        ARR = oli.ListPrice - oli.TotalPrice;
+                        oli.Discount_Amount2__c = ARR;
+                    }
+                } 
+                else if(oli.CB_Coupon__c != NULL )
+                {
+                    
+                    chargebeeapps__Coupon__c coupon = [Select id,chargebeeapps__Discount_Amount__c,chargebeeapps__Duration_Month__c, chargebeeapps__Discount_Percentage__c, chargebeeapps__Discount_Type__c, chargebeeapps__Duration_Type__c  from chargebeeapps__Coupon__c where id  = : oli.CB_Coupon__c];
+                    
+                    //system.debug('---------chargebeeapps__Duration_Month__c ' +coupon.chargebeeapps__Duration_Month__c);
+                    //system.debug('--------coupon.chargebeeapps__Discount_Percentage__c ' +coupon.chargebeeapps__Discount_Percentage__c);
+                    //system.debug('---------oli.ListPrice ' +oli.ListPrice);
+                    //system.debug('-------oli.ARR__c ' +oli.ARR__c);
+                    
+                    if (coupon.chargebeeapps__Discount_Type__c == 'PERCENTAGE') {
+                        if (coupon.chargebeeapps__Duration_Type__c == 'ONE_TIME') {
+                            ARR = (oli.ListPrice * coupon.chargebeeapps__Discount_Percentage__c);
+                        } else if (coupon.chargebeeapps__Duration_Type__c == 'FOREVER') {
+                            ARR =  ((oli.ListPrice * coupon.chargebeeapps__Discount_Percentage__c) * 12);
+                        } else {               
+                            ARR =   ((oli.ListPrice / 100) * coupon.chargebeeapps__Discount_Percentage__c) * coupon.chargebeeapps__Duration_Month__c;
+                            
+                        }
+                    } else if (coupon.chargebeeapps__Discount_Type__c == 'FIXED_AMOUNT') {
+                        ARR =  coupon.chargebeeapps__Discount_Amount__c;
+                    } else {
+                        // system.debug('---- we are here at else else');
+                        oli.Discount_Amount2__c = 0;
+                    }
+                    
+                    oli.Discount_Amount2__c = ARR;
+                }
+                else if(oli.CB_Coupon2__c != NULL )
+                {
+                    chargebeeapps__Coupon__c coupon = [Select id,chargebeeapps__Discount_Amount__c,chargebeeapps__Duration_Month__c ,chargebeeapps__Discount_Percentage__c, chargebeeapps__Discount_Type__c, chargebeeapps__Duration_Type__c  from chargebeeapps__Coupon__c where id  = : oli.CB_Coupon2__c];
+                    
+                    //system.debug('---------chargebeeapps__Duration_Month__c ' +coupon.chargebeeapps__Duration_Month__c);
+                    //system.debug('--------coupon.chargebeeapps__Discount_Percentage__c ' +coupon.chargebeeapps__Discount_Percentage__c);
+                    //system.debug('---------oli.ListPrice ' +oli.ListPrice);
+                    //system.debug('-------oli.ARR__c ' +oli.ARR__c);
+                    
+                    if (coupon.chargebeeapps__Discount_Type__c == 'PERCENTAGE') {
+                        if (coupon.chargebeeapps__Duration_Type__c == 'ONE_TIME') {
+                            ARR = (oli.ListPrice * coupon.chargebeeapps__Discount_Percentage__c);
+                        } else if (coupon.chargebeeapps__Duration_Type__c == 'FOREVER') {
+                            ARR =  ((oli.ListPrice * coupon.chargebeeapps__Discount_Percentage__c) * 12);
+                        } else {               
+                            ARR =   ((oli.ListPrice / 100) * coupon.chargebeeapps__Discount_Percentage__c) * coupon.chargebeeapps__Duration_Month__c;
+                            
+                        }
+                    } else if (coupon.chargebeeapps__Discount_Type__c == 'FIXED_AMOUNT') {
+                        ARR =  coupon.chargebeeapps__Discount_Amount__c;
+                    } else {
+                        // system.debug('---- we are here at else else');
+                        oli.Discount_Amount2__c = 0;
+                    }
+                    
+                    oli.Discount_Amount2__c = ARR;
+                    
+                }
+                else
+                {
+                    oli.Discount_Amount2__c = 0;
+                }
+                //system.debug('Discount Line Item ---- '+ oli.Id + ' ---- ' + oli.Discount_Amount2__c);
+            } 
+        }
+        System.debug('updateDiscount -----   -------------------> End');
+    }
+    
     public static void RecurringFeeUpdate(List<OpportunityLineItem> newOpportunityLineItems, List<OpportunityLineItem> oldOpportunityLineItems, 
                                           Map<ID, OpportunityLineItem> newOpportunityMaps , Map<ID, OpportunityLineItem> oldOpportunityMaps) 
     {
+        //System.debug('RecurringFeeUpdate ------------------------> Start');
         
         
+        List<OpportunityLineItem> forLoopOLI = [Select id, OpportunityId from OpportunityLineItem where id in :newOpportunityLineItems];
         Set<Id> opportunityIds = new Set<Id>();
-        for (OpportunityLineItem o : newOpportunityLineItems) {
+        Set<Id> opportunityLineIds = new Set<Id>();
+        for (OpportunityLineItem o : newOpportunityLineItems) // replaced with newOpportunityLineItems  ---> forLoopOLI
+        {
             opportunityIds.add(o.OpportunityId);
+            opportunityLineIds.add(o.Id);
         }
         
         
         Map<Id, List<OpportunityLineItem>> opportunityProductMap = new Map<Id, List<OpportunityLineItem>>();
-        for (OpportunityLineItem oli : [SELECT Id, OpportunityId, Recurring_Fee_Monthly__c,TotalPrice, Recurring_Fee_Annual__c ,CB_Product_type__c,  Discount_Amount__c , ListPrice FROM OpportunityLineItem WHERE OpportunityId IN :opportunityIds]) {
-            if (!opportunityProductMap.containsKey(oli.OpportunityId)) {
+        
+        Decimal monthlySum;
+        Decimal annualSum;
+        Decimal DiscountSum;
+        Decimal ConValAfterDis;
+        Decimal ImpFeeSum ;
+        Decimal FirstSubscriptionInvoiceSum;
+        
+        for (OpportunityLineItem oli :
+             [SELECT Id,Discount_Amount2__c, OpportunityId, Recurring_Fee_Monthly__c,TotalPrice, Recurring_Fee_Annual__c ,CB_Product_type__c,  Discount_Amount__c , ListPrice
+              FROM OpportunityLineItem WHERE OpportunityId IN :opportunityIds])
+        {
+            if (!opportunityProductMap.containsKey(oli.OpportunityId))
+            {
                 opportunityProductMap.put(oli.OpportunityId, new List<OpportunityLineItem>());
             }
             opportunityProductMap.get(oli.OpportunityId).add(oli);
         }
         
-         
         Map<Id, Decimal> recurringFeeMonthlyMap = new Map<Id, Decimal>();
         Map<Id, Decimal> recurringFeeAnnualMap = new Map<Id, Decimal>();
         Map<Id, Decimal> TotalDiscount1styearMap = new Map<Id, Decimal>();
         Map<Id, Decimal> ContractValueAfterDiscountsMap = new Map<Id, Decimal>();
         Map<Id, Decimal> ImpFeeInvoiceMap = new Map<Id, Decimal>();
         Map<Id, Decimal> FirstSubscriptionInvoiceMAP = new Map<Id, Decimal>();
+        //    Map<Id, Decimal> TotalDiscountwithCouponsMap = new Map<Id, Decimal>();
         
-        for (Id opportunityId : opportunityProductMap.keySet()) {
-            Decimal monthlySum = 0;
-            Decimal annualSum = 0;
-            Decimal DiscountSum = 0;
-            Decimal ConValAfterDis = 0;
-            Decimal ImpFeeSum = 0;
-            Decimal FirstSubscriptionInvoiceSum = 0;
+        
+        for (Id opportunityId : opportunityProductMap.keySet()) 
+        {
             
-            for (OpportunityLineItem oli : opportunityProductMap.get(opportunityId)) {
+            //=============
+            monthlySum = 0;
+            annualSum = 0;
+            DiscountSum = 0;
+            ConValAfterDis = 0;
+            ImpFeeSum = 0;
+            //      Decimal TotalDiscountwithCouponsSum = 0;
+            FirstSubscriptionInvoiceSum = 0;
+            
+            for (OpportunityLineItem oli : opportunityProductMap.get(opportunityId)) 
+            {
                 monthlySum += oli.Recurring_Fee_Monthly__c;
                 annualSum += oli.Recurring_Fee_Annual__c;
-                DiscountSum += oli.Discount_Amount__c;
                 
-                if(oli.CB_Product_type__c == 'CHARGE'){
+                DiscountSum += oli.Discount_Amount2__c;
+                if(oli.CB_Product_type__c == 'CHARGE')
+                {
                     ConValAfterDis += oli.ListPrice;
                     ImpFeeSum += oli.TotalPrice;
-                }else{
+                }
+                else
+                {
                     ConValAfterDis += oli.Recurring_Fee_Annual__c;
                     FirstSubscriptionInvoiceSum += oli.TotalPrice;
                 }
-                system.debug('------monthlySum= ' + oli.Recurring_Fee_Monthly__c);
-                system.debug('------annualSum= ' + oli.Recurring_Fee_Annual__c);
+                
             }
-            
-            system.debug('------monthlySum= ' + monthlySum);
-            system.debug('------annualSum= ' + annualSum);
-            system.debug('-----------Opp name= ' + opportunityProductMap.get(opportunityId));
             
             recurringFeeMonthlyMap.put(opportunityId, monthlySum);
             recurringFeeAnnualMap.put(opportunityId, annualSum);
@@ -62,7 +179,7 @@ public class UpdateRecurringFee {
             ImpFeeInvoiceMap.put(opportunityId , ImpFeeSum);
             FirstSubscriptionInvoiceMAP.put(opportunityId , FirstSubscriptionInvoiceSum);
         }
-      
+        
         List<Opportunity> opportunitiesToUpdate = new List<Opportunity>();
         for (Opportunity opp : [SELECT Id, Recurring_Fee_Monthly__c, Recurring_Fee_Annual__c FROM Opportunity WHERE Id IN :opportunityIds]) {
             if (recurringFeeMonthlyMap.containsKey(opp.Id)) {
@@ -72,10 +189,19 @@ public class UpdateRecurringFee {
                 opp.Implementation_Fee_Invoice__c = ImpFeeInvoiceMap.get(opp.Id);
                 opp.X1st_Year_Contract_Value_after_discounts__c = ContractValueAfterDiscountsMap.get(opp.Id) - TotalDiscount1styearMap.get(opp.Id);
                 opp.X1st_Subscription_Invoice__c = FirstSubscriptionInvoiceMAP.get(opp.Id);
+                //      opp.Total_Discount_with_Coupons__c = FirstSubscriptionInvoiceMAP.get(opp.Id);
                 opportunitiesToUpdate.add(opp);
             }
         }
+        //System.debug('Opp to update ------------------------> ' + opportunitiesToUpdate.size());
+        //System.debug('Opp to update ------------------------> ' + opportunitiesToUpdate);
+        //System.debug('RecurringFeeUpdate ------------------------> End');
         update opportunitiesToUpdate;
         
     }
+    
+    
+    
+    
+    
 }
